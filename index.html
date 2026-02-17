@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOMFA DEATH BATTLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --bg-secondary: #111111;
+            --fg: #f0f0f0;
+            --muted: #707070;
+            --accent: #00d4aa;
+            --accent-secondary: #ff7b2e;
+            --card: #141414;
+            --border: #252525;
+            --glow-accent: rgba(0, 212, 170, 0.4);
+            --glow-secondary: rgba(255, 123, 46, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--fg); overflow-x: hidden; }
+
+        #intro {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(180deg, #020202 0%, #080808 50%, #030303 100%);
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+        #intro.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        /* START BUTTON - MINIMALIS AURORA GRADIENT */
+        #startOverlay {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: opacity 0.6s ease;
+        }
+        #startOverlay.hide { opacity: 0; pointer-events: none; }
+
+        #startBtn {
+            position: relative;
+            background: transparent;
+            border: none; /* Border ditangani pseudo element */
+            color: var(--fg);
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 500;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            cursor: pointer;
+            padding: 1.2rem 3.5rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Aurora Gradient Border */
+        #startBtn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 0;
+            padding: 1px; /* Border thickness */
+            background: linear-gradient(90deg, #00d4aa, #ff7b2e, #00d4aa, #7b2eff, #00d4aa);
+            background-size: 300% 100%; /* For animation */
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: auroraBorder 4s linear infinite;
+            z-index: -1;
+        }
+
+        /* Aurora Gradient Text */
+        #startBtn::after {
+            content: 'START';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #ffffff, #00d4aa, #ffffff, #ff7b2e, #ffffff);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: auroraText 4s linear infinite;
+            transition: opacity 0.3s;
+        }
+
+        /* Hover State - Glow */
+        #startBtn:hover::before {
+            filter: drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 15px var(--accent-secondary));
+            animation: auroraBorder 1.5s linear infinite;
+        }
+        
+        #startBtn:hover::after {
+            animation: auroraText 1.5s linear infinite;
+            filter: drop-shadow(0 0 5px var(--accent));
+        }
+
+        #startBtn:active { transform: scale(0.98); }
+
+        @keyframes auroraBorder {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+        @keyframes auroraText {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        /* LOGO STYLING */
+        .intro-beast { width: 280px; height: 280px; position: relative; margin-bottom: 2.5rem; }
+
+        .logo-luxury-frame {
+            width: 280px; height: 280px; position: relative; border-radius: 50%; padding: 5px;
+            background: linear-gradient(135deg, #00d4aa 0%, #ff7b2e 25%, #00d4aa 50%, #ff7b2e 75%, #00d4aa 100%);
+            background-size: 300% 300%;
+            box-shadow: 0 0 60px rgba(0, 212, 170, 0.7), 0 0 120px rgba(255, 123, 46, 0.5), 0 0 180px rgba(0, 212, 170, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.5);
+            opacity: 0; 
+            transform: scale(0.3);
+        }
+
+        .logo-luxury-frame.animate {
+            animation: frameAppear 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards, gradientShift 6s ease infinite;
+        }
+
+        @keyframes frameAppear { 
+            0% { opacity: 0; transform: scale(0.3) rotate(-20deg); } 
+            60% { transform: scale(1.08) rotate(5deg); } 
+            100% { opacity: 1; transform: scale(1) rotate(0deg); } 
+        }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+        /* Logo Container */
+        .logo-content {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #020202;
+            overflow: hidden;
+        }
+        
+        /* Gambar Gagak PurePNG (Direct Link) */
+        .crow-img {
+            width: 110%; 
+            height: 110%;
+            object-fit: cover;
+            filter: grayscale(100%) brightness(0.6) contrast(1.3);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .crow-img.loaded { opacity: 1; }
+
+        .logo-inner-ring {
+            position: absolute; inset: -12px; border-radius: 50%; border: 2px solid transparent;
+            background: linear-gradient(var(--bg), var(--bg)) padding-box, linear-gradient(135deg, var(--accent), transparent, var(--accent-secondary)) border-box;
+            animation: ringPulse 3s ease-in-out infinite; pointer-events: none; z-index: 10;
+        }
+        @keyframes ringPulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.02); } }
+
+        .logo-sparkle { position: absolute; width: 8px; height: 8px; background: #ffffff; border-radius: 50%; filter: blur(1px); animation: sparkleAnim 2s ease-in-out infinite; z-index: 20; }
+        .logo-sparkle:nth-child(1) { top: -4px; left: 50%; animation-delay: 0s; }
+        .logo-sparkle:nth-child(2) { top: 50%; right: -4px; animation-delay: 0.4s; }
+        .logo-sparkle:nth-child(3) { bottom: -4px; left: 50%; animation-delay: 0.8s; }
+        .logo-sparkle:nth-child(4) { top: 50%; left: -4px; animation-delay: 1.2s; }
+        @keyframes sparkleAnim { 0%, 100% { opacity: 0; transform: scale(0); } 50% { opacity: 1; transform: scale(1.5); } }
+
+        /* TEXT ANIMATIONS */
+        .intro-title {
+            font-family: 'Oswald', sans-serif; font-size: clamp(2rem, 9vw, 5.5rem); font-weight: 700; letter-spacing: 0.25em; text-align: center;
+            opacity: 0;
+            transform: translateY(40px) scale(0.9);
+            color: var(--fg); text-shadow: 0 0 80px rgba(0, 212, 170, 0.6);
+        }
+        .intro-title.animate { animation: titleReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .intro-subtitle { 
+            font-family: 'Oswald', sans-serif; font-size: clamp(0.85rem, 1.8vw, 1.1rem); letter-spacing: 0.9em; text-transform: uppercase; color: var(--accent); margin-top: 1.2rem; opacity: 0; 
+        }
+        .intro-subtitle.animate { animation: fadeIn 1s ease forwards; }
+        
+        @keyframes titleReveal { to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .intro-line { width: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), var(--accent-secondary), transparent); margin-top: 1.8rem; }
+        .intro-line.animate { animation: lineExpand 1.5s ease forwards; }
+        @keyframes lineExpand { to { width: 280px; } }
+
+        #main-content { opacity: 0; transition: opacity 0.8s ease; }
+        #main-content.visible { opacity: 1; }
+
+        /* HEADER & OTHER STYLES (PRESERVED) */
+        header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; padding: 1.2rem 2.5rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, var(--bg) 0%, transparent 100%); pointer-events: none; }
+        header > * { pointer-events: auto; }
+        .logo { font-family: 'Oswald', sans-serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.25em; color: var(--fg); transition: color 0.3s ease; }
+        .logo:hover { color: var(--accent); }
+
+        .back-btn { display: none; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; background: transparent; border: 1px solid var(--border); color: var(--fg); font-family: 'Oswald', sans-serif; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.18em; cursor: pointer; transition: all 0.3s ease; }
+        .back-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+        .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6rem 2rem 3rem; position: relative; }
+        .hero-title { font-family: 'Oswald', sans-serif; font-size: clamp(2.5rem, 12vw, 7rem); font-weight: 700; letter-spacing: 0.12em; line-height: 0.9; text-align: center; margin-bottom: 0.4rem; }
+        .hero-title .line1 { display: block; color: var(--fg); }
+        .hero-title .line2 { display: block; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-subtitle { font-family: 'Oswald', sans-serif; font-size: 0.9rem; color: var(--muted); letter-spacing: 0.7em; text-transform: uppercase; margin-bottom: 4rem; }
+
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.8rem; max-width: 1050px; width: 100%; padding: 0 2rem; }
+        @media (max-width: 900px) { .features-grid { grid-template-columns: 1fr; max-width: 380px; gap: 1.3rem; } }
+
+        .feature-card { background: var(--card); border: 1px solid var(--border); padding: 2.2rem 1.8rem; position: relative; overflow: hidden; cursor: pointer; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+        .feature-card:hover::before { transform: scaleX(1); }
+        .feature-card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4), 0 0 35px var(--glow-accent); }
+
+        .feature-number { font-family: 'Oswald', sans-serif; font-size: 48px; font-weight: 700; position: absolute; top: 8px; right: 14px; color: var(--border); line-height: 1; transition: color 0.3s ease; }
+        .feature-card:hover .feature-number { color: rgba(0, 212, 170, 0.15); }
+        .feature-icon { width: 55px; height: 55px; margin-bottom: 1.3rem; color: var(--accent); transition: transform 0.4s ease, color 0.3s ease; }
+        .feature-card:hover .feature-icon { transform: scale(1.08); color: var(--accent-secondary); }
+        .feature-title { font-family: 'Oswald', sans-serif; font-size: 1.6rem; font-weight: 600; letter-spacing: 0.08em; margin-bottom: 0.7rem; color: var(--fg); }
+        .feature-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; }
+
+        .tool-section { min-height: 100vh; padding: 6rem 2rem 2.5rem; display: none; align-items: flex-start; justify-content: center; }
+        .tool-section.active { display: flex; }
+        .tool-wrapper { display: flex; gap: 2.5rem; max-width: 1150px; width: 100%; align-items: flex-start; }
+        #spinTool .tool-wrapper { align-items: center; }
+        @media (max-width: 900px) { .tool-wrapper { flex-direction: column; align-items: center; } }
+
+        .tool-panel { background: var(--card); border: 1px solid var(--border); padding: 1.8rem; flex: 1; min-width: 280px; }
+        .tool-panel-title { font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.14em; color: var(--accent); margin-bottom: 1.3rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--border); }
+        .tool-display-area { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 320px; }
+
+        .coin-scene { perspective: 1200px; width: 180px; height: 180px; margin-bottom: 1.8rem; }
+        .coin-3d { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
+        .coin-side { position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 4px solid; }
+        .coin-heads { background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border-color: var(--accent); box-shadow: inset 0 0 35px rgba(0, 212, 170, 0.15), 0 0 25px rgba(0, 212, 170, 0.3), 0 12px 30px rgba(0, 0, 0, 0.5); }
+        .coin-tails { background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border-color: var(--accent-secondary); box-shadow: inset 0 0 35px rgba(255, 123, 46, 0.15), 0 0 25px rgba(255, 123, 46, 0.3), 0 12px 30px rgba(0, 0, 0, 0.5); transform: rotateY(180deg); }
+        .coin-label { font-family: 'Oswald', sans-serif; font-size: 1.3rem; font-weight: 600; letter-spacing: 0.18em; }
+        .coin-heads .coin-label { color: var(--accent); }
+        .coin-tails .coin-label { color: var(--accent-secondary); }
+        .coin-icon { width: 45px; height: 45px; margin-bottom: 0.4rem; }
+        .coin-result { font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.28em; height: 2.5rem; display: flex; align-items: center; justify-content: center; }
+
+        .number-box { background: linear-gradient(145deg, var(--card), #0d0d0d); border: 2px solid var(--border); padding: 1.8rem 3.5rem; position: relative; overflow: hidden; }
+        .number-box::before, .number-box::after { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), var(--accent-secondary), transparent); }
+        .number-box::before { top: 0; }
+        .number-box::after { bottom: 0; }
+        .number-value { font-family: 'Oswald', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: 0.08em; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; min-width: 200px; text-align: center; }
+        .number-value.rolling { animation: numberShake 0.08s linear infinite; }
+        @keyframes numberShake { 0%, 100% { transform: translateY(0); } 25% { transform: translateY(-2px); } 75% { transform: translateY(2px); } }
+
+        /* SPIN WHEEL */
+        .wheel-stage { position: relative; width: 320px; height: 320px; flex-shrink: 0; }
+        .wheel-outer-ring { position: absolute; inset: -15px; border-radius: 50%; border: 4px solid var(--border); background: linear-gradient(145deg, #1a1a1a, #0a0a0a); box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.5); }
+        .wheel-container { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.6); border: 3px solid rgba(255,255,255,0.1); }
+        #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; }
+        .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 20; filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.6)); }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(145deg, var(--accent), var(--accent-secondary)); z-index: 15; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), inset 0 2px 5px rgba(255,255,255,0.2); }
+        .wheel-center svg { color: var(--bg); }
+
+        .spin-inputs-container { max-height: 260px; overflow-y: auto; padding-right: 0.4rem; margin-bottom: 0.8rem; }
+        .spin-inputs-container::-webkit-scrollbar { width: 3px; }
+        .spin-inputs-container::-webkit-scrollbar-track { background: var(--bg); }
+        .spin-inputs-container::-webkit-scrollbar-thumb { background: var(--border); }
+        .spin-input-row { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; }
+        .spin-input-row input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--fg); padding: 0.55rem 0.7rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; transition: border-color 0.3s ease; }
+        .spin-input-row input:focus { outline: none; border-color: var(--accent); }
+        .spin-input-row .remove-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); width: 35px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .spin-input-row .remove-btn:hover { border-color: #ff4444; color: #ff4444; }
+
+        .add-btn { width: 100%; padding: 0.6rem; background: transparent; border: 1px dashed var(--border); color: var(--muted); font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; cursor: pointer; transition: all 0.3s ease; margin-bottom: 1.3rem; }
+        .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .action-btn { width: 100%; padding: 1rem 1.8rem; background: transparent; border: 2px solid var(--accent); color: var(--accent); font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 600; letter-spacing: 0.22em; cursor: pointer; position: relative; overflow: hidden; transition: all 0.4s ease; }
+        .action-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); transform: translateY(100%); transition: transform 0.4s ease; z-index: -1; }
+        .action-btn:hover::before { transform: translateY(0); }
+        .action-btn:hover { color: var(--bg); border-color: var(--accent-secondary); }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .winner-display { background: var(--card); border: 2px solid var(--accent); padding: 1.3rem 2.5rem; text-align: center; margin-top: 1.3rem; display: none; }
+        .winner-display.show { display: block; animation: winnerPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes winnerPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .winner-label { font-family: 'Oswald', sans-serif; font-size: 0.75rem; letter-spacing: 0.28em; color: var(--muted); margin-bottom: 0.4rem; }
+        .winner-text { font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.12em; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .click-ripple { position: fixed; pointer-events: none; z-index: 9998; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, var(--glow-accent) 0%, transparent 70%); transform: translate(-50%, -50%) scale(0); animation: rippleExpand 0.5s ease-out forwards; }
+        @keyframes rippleExpand { 0% { transform: translate(-50%, -50%) scale(0); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; } }
+
+        footer { padding: 3rem 2rem; text-align: center; background: linear-gradient(180deg, var(--bg) 0%, #050505 100%); border-top: 1px solid var(--border); position: relative; }
+        footer::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 200px; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+        .footer-content { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .footer-main-title { font-family: 'Oswald', sans-serif; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+        .footer-grid { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; }
+        .footer-item { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-width: 120px; }
+        .footer-item .label { font-family: 'Oswald', sans-serif; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; }
+        .footer-item .value { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; color: var(--fg); letter-spacing: 0.05em; }
+        .footer-divider { width: 1px; height: 30px; background: var(--border); align-self: center; }
+        @media (max-width: 640px) { .footer-grid { flex-direction: column; gap: 1.5rem; } .footer-divider { display: none; } }
+
+        .reveal-item { opacity: 0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal-item.visible { opacity: 1; transform: translateY(0); }
+
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+
+        @media (max-width: 640px) {
+            header { padding: 1rem 1.4rem; }
+            .hero { padding: 5rem 1rem 2rem; }
+            .features-grid { padding: 0 1rem; }
+            .feature-card { padding: 1.8rem 1.4rem; }
+            .tool-section { padding: 4.5rem 1rem 2rem; }
+            .tool-wrapper { padding: 0 0.4rem; }
+            .tool-panel { padding: 1.4rem; }
+            .wheel-stage { width: 260px; height: 260px; }
+            .number-value { font-size: 56px; }
+            .coin-scene { width: 150px; height: 150px; }
+            .intro-beast, .logo-luxury-frame { width: 220px; height: 220px; }
+            #startBtn { font-size: 2rem; padding: 1rem 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Intro -->
+    <div id="intro">
+        <div id="startOverlay">
+            <button id="startBtn">START</button>
+        </div>
+
+        <div class="intro-beast">
+            <div class="logo-luxury-frame" id="logoFrame">
+                <div class="logo-inner-ring">
+                    <div class="logo-sparkle"></div>
+                    <div class="logo-sparkle"></div>
+                    <div class="logo-sparkle"></div>
+                    <div class="logo-sparkle"></div>
+                </div>
+                <!-- FOTO GAGAK PUREPNG (DIRECT LINK) -->
+                <div class="logo-content">
+                    <img id="crowImg" class="crow-img" alt="Crow" src="" style="display:none;">
+                </div>
+            </div>
+        </div>
+        <h1 class="intro-title" id="introTitle">FOMFA DEATH BATTLE</h1>
+        <p class="intro-subtitle" id="introSubtitle">Choose Your Fate</p>
+        <div class="intro-line" id="introLine"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <header><div class="logo">FOMFA</div><button class="back-btn" id="backBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>BACK</button></header>
+
+        <section class="hero" id="heroSection">
+            <h1 class="hero-title reveal-item"><span class="line1">FOMFA DEATH</span><span class="line2">BATTLE</span></h1>
+            <p class="hero-subtitle reveal-item">SELECT YOUR GAME</p>
+            <div class="features-grid">
+                <div class="feature-card reveal-item" data-tool="coin"><span class="feature-number">01</span><svg class="feature-icon" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="30" cy="30" r="26"/><circle cx="30" cy="30" r="18"/><path d="M30 12 L33 27 L48 30 L33 33 L30 48 L27 33 L12 30 L27 27 Z"/></svg><h3 class="feature-title">FLIP COIN</h3><p class="feature-desc">Two sides, one fate. Heads or tails, let destiny speak.</p></div>
+                <div class="feature-card reveal-item" data-tool="number"><span class="feature-number">02</span><svg class="feature-icon" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="15" width="44" height="30" rx="2"/><text x="30" y="36" text-anchor="middle" fill="currentColor" font-family="Oswald" font-size="16" font-weight="600">#</text></svg><h3 class="feature-title">NUMBER GENERATOR</h3><p class="feature-desc">Random from zero to thousand. Chaos decides your path.</p></div>
+                <div class="feature-card reveal-item" data-tool="spin"><span class="feature-number">03</span><svg class="feature-icon" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="30" cy="30" r="26"/><circle cx="30" cy="30" r="6" fill="currentColor"/><path d="M30 4 L32 14 L28 14 Z" fill="currentColor"/><line x1="30" y1="14" x2="30" y2="24" stroke="currentColor" stroke-width="2"/></svg><h3 class="feature-title">SPIN WHEEL</h3><p class="feature-desc">Up to thirty paths. Customize and spin the wheel.</p></div>
+            </div>
+        </section>
+
+        <!-- Coin Tool -->
+        <section class="tool-section" id="coinTool"><div class="tool-wrapper"><div class="tool-panel"><h3 class="tool-panel-title">INSTRUCTIONS</h3><p style="color: var(--muted); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.4rem;">A coin with two sides: <strong style="color: var(--accent);">HEADS</strong> and <strong style="color: var(--accent-secondary);">TAILS</strong>. Press the button to flip.</p><div style="padding: 1rem; background: var(--bg); border: 1px solid var(--border);"><div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;"><span style="color: var(--accent); font-size: 0.78rem; font-family: 'Oswald', sans-serif; letter-spacing: 0.1em;">HEADS</span><span style="color: var(--muted); font-size: 0.78rem;" id="headsCount">0</span></div><div style="display: flex; justify-content: space-between;"><span style="color: var(--accent-secondary); font-size: 0.78rem; font-family: 'Oswald', sans-serif; letter-spacing: 0.1em;">TAILS</span><span style="color: var(--muted); font-size: 0.78rem;" id="tailsCount">0</span></div></div></div><div class="tool-display-area"><div class="coin-scene"><div class="coin-3d" id="coin"><div class="coin-side coin-heads"><svg class="coin-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="25" cy="25" r="20"/><path d="M25 10 L28 22 L40 25 L28 28 L25 40 L22 28 L10 25 L22 22 Z"/></svg><span class="coin-label">HEADS</span></div><div class="coin-side coin-tails"><svg class="coin-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="25" cy="25" r="20"/><circle cx="25" cy="25" r="8"/></svg><span class="coin-label">TAILS</span></div></div></div><div class="coin-result" id="coinResult"></div><button class="action-btn" id="flipBtn" style="margin-top: 0.8rem;">FLIP THE COIN</button></div></div></section>
+
+        <!-- Number Tool -->
+        <section class="tool-section" id="numberTool"><div class="tool-wrapper" style="justify-content: center;"><div class="tool-panel"><h3 class="tool-panel-title">RANGE SETTINGS</h3><div style="display: flex; gap: 0.8rem; margin-bottom: 1.4rem;"><div style="flex: 1;"><label style="font-size: 0.72rem; color: var(--muted); letter-spacing: 0.12em; font-family: 'Oswald', sans-serif;">MIN</label><input type="number" id="minRange" value="0" min="0" max="999" style="width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--fg); padding: 0.6rem; margin-top: 0.35rem;"></div><div style="flex: 1;"><label style="font-size: 0.72rem; color: var(--muted); letter-spacing: 0.12em; font-family: 'Oswald', sans-serif;">MAX</label><input type="number" id="maxRange" value="1000" min="1" max="1000" style="width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--fg); padding: 0.6rem; margin-top: 0.35rem;"></div></div></div><div class="tool-display-area"><div class="number-box"><div class="number-value" id="numberDisplay">000</div></div><button class="action-btn" id="generateBtn" style="margin-top: 1.8rem;">GENERATE</button></div></div></section>
+
+        <!-- Spin Tool -->
+        <section class="tool-section" id="spinTool"><div class="tool-wrapper"><div class="tool-panel" style="max-width: 330px;"><h3 class="tool-panel-title">WHEEL OPTIONS</h3><div class="spin-inputs-container" id="wheelInputs"><div class="spin-input-row"><input type="text" placeholder="Option 1" value="Option 1"><button type="button" class="remove-btn" aria-label="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="spin-input-row"><input type="text" placeholder="Option 2" value="Option 2"><button type="button" class="remove-btn" aria-label="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div></div><button class="add-btn" id="addSegmentBtn">+ ADD OPTION</button></div><div class="tool-display-area"><div class="wheel-stage"><div class="wheel-outer-ring"></div><div class="wheel-pointer"><svg width="32" height="40" viewBox="0 0 32 40" fill="none"><defs><linearGradient id="pointerGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00d4aa"/><stop offset="100%" style="stop-color:#ff7b2e"/></linearGradient></defs><path d="M16 40 L0 12 L16 0 L32 12 Z" fill="url(#pointerGrad)"/></svg></div><div class="wheel-container"><canvas id="wheelCanvas"></canvas></div><div class="wheel-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div></div><button class="action-btn" id="spinBtn" style="margin-top: 24px;">SPIN THE WHEEL</button><div class="winner-display" id="winnerDisplay"><p class="winner-label">WINNER</p><p class="winner-text" id="winnerText"></p></div></div></div></section>
+
+        <footer id="mainFooter"><div class="footer-content"><div class="footer-main-title">FOMFA Death Battle</div><div class="footer-grid"><div class="footer-item"><span class="label">Developer</span><span class="value">GABRIEL</span></div><div class="footer-divider"></div><div class="footer-item"><span class="label">Supporter</span><span class="value">MARU, DIMAS & SAHROL</span></div><div class="footer-divider"></div><div class="footer-item"><span class="label">Sponsor</span><span class="value">FOMFA</span></div></div></div></footer>
+    </div>
+
+    <script>
+        // ============ DOM ELEMENTS ============
+        const intro = document.getElementById('intro'); const startOverlay = document.getElementById('startOverlay'); const startBtn = document.getElementById('startBtn'); const mainContent = document.getElementById('main-content'); const heroSection = document.getElementById('heroSection'); const mainFooter = document.getElementById('mainFooter'); const backBtn = document.getElementById('backBtn'); const featureCards = document.querySelectorAll('.feature-card'); const logoFrame = document.getElementById('logoFrame'); const introTitle = document.getElementById('introTitle'); const introSubtitle = document.getElementById('introSubtitle'); const introLine = document.getElementById('introLine');
+        const crowImg = document.getElementById('crowImg');
+        const coin = document.getElementById('coin'); const flipBtn = document.getElementById('flipBtn'); const coinResult = document.getElementById('coinResult'); const headsCount = document.getElementById('headsCount'); const tailsCount = document.getElementById('tailsCount'); const numberDisplay = document.getElementById('numberDisplay'); const generateBtn = document.getElementById('generateBtn'); const minRange = document.getElementById('minRange'); const maxRange = document.getElementById('maxRange'); const wheelCanvas = document.getElementById('wheelCanvas'); const spinBtn = document.getElementById('spinBtn'); const wheelInputs = document.getElementById('wheelInputs'); const addSegmentBtn = document.getElementById('addSegmentBtn'); const winnerDisplay = document.getElementById('winnerDisplay'); const winnerText = document.getElementById('winnerText');
+
+        let currentTool = null; let isAnimating = false; let wheelSegments = ['Option 1', 'Option 2']; let audioCtx = null; let headsTotal = 0; let tailsTotal = 0; let currentInterval = null; let currentTimeouts = []; let wheelAngle = 0; let wheelAnimationId = null;
+        const wheelColors = ['#00d4aa', '#ff7b2e', '#00b894', '#fdcb6e', '#00cec9', '#e17055', '#55a3ff', '#fd79a8', '#74b9ff', '#ffeaa7', '#81ecec', '#fab1a0', '#a29bfe', '#dfe6e9', '#636e72', '#2d3436', '#00d4aa', '#ff7b2e', '#00b894', '#fdcb6e', '#00cec9', '#e17055', '#55a3ff', '#fd79a8', '#74b9ff', '#ffeaa7', '#81ecec', '#fab1a0', '#a29bfe', '#dfe6e9'];
+
+        // ============ AUDIO ============
+        function initAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return audioCtx; }
+        function unlockAudio() { if (!audioCtx) initAudio(); if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); } if (audioCtx) { try { const buffer = audioCtx.createBuffer(1, 1, 22050); const source = audioCtx.createBufferSource(); source.buffer = buffer; source.connect(audioCtx.destination); source.start(0); } catch (e) {} } }
+        function stopAllSounds() { if (currentInterval) { clearInterval(currentInterval); currentInterval = null; } currentTimeouts.forEach(t => clearTimeout(t)); currentTimeouts = []; if (wheelAnimationId) { cancelAnimationFrame(wheelAnimationId); wheelAnimationId = null; } }
+        function playSound(type) { if (!audioCtx) return; try { if (audioCtx.state === 'suspended') audioCtx.resume(); } catch (e) { return; } const now = audioCtx.currentTime; try { switch(type) { case 'intro': { const subBass = audioCtx.createOscillator(); const subGain = audioCtx.createGain(); subBass.connect(subGain); subGain.connect(audioCtx.destination); subBass.type = 'sine'; subBass.frequency.setValueAtTime(55, now); subBass.frequency.linearRampToValueAtTime(41.2, now + 1.6); subGain.gain.setValueAtTime(1.0, now); subGain.gain.linearRampToValueAtTime(0, now + 2.2); subBass.start(now); subBass.stop(now + 2.2); const brassNotes = [{ freq: 146.83, start: 0 }, { freq: 174.61, start: 0 }, { freq: 220, start: 0 }, { freq: 130.81, start: 0.8 }, { freq: 164.81, start: 0.8 }, { freq: 220, start: 0.8 }]; brassNotes.forEach(note => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(note.freq, now + note.start); gain.gain.setValueAtTime(0, now + note.start); gain.gain.linearRampToValueAtTime(0.25, now + note.start + 0.15); gain.gain.linearRampToValueAtTime(0, now + note.start + 1.6); osc.start(now + note.start); osc.stop(now + note.start + 1.8); }); const impact = audioCtx.createOscillator(); const impactGain = audioCtx.createGain(); impact.connect(impactGain); impactGain.connect(audioCtx.destination); impact.type = 'triangle'; impact.frequency.setValueAtTime(200, now); impact.frequency.exponentialRampToValueAtTime(50, now + 0.5); impactGain.gain.setValueAtTime(1.0, now); impactGain.gain.exponentialRampToValueAtTime(0.01, now + 0.6); impact.start(now); impact.stop(now + 0.6); const rise = audioCtx.createOscillator(); const riseGain = audioCtx.createGain(); const riseFilter = audioCtx.createBiquadFilter(); rise.connect(riseFilter); riseFilter.connect(riseGain); riseGain.connect(audioCtx.destination); rise.type = 'sawtooth'; riseFilter.type = 'lowpass'; riseFilter.frequency.setValueAtTime(200, now); riseFilter.frequency.linearRampToValueAtTime(2500, now + 1.5); rise.frequency.setValueAtTime(80, now); rise.frequency.linearRampToValueAtTime(350, now + 1.5); riseGain.gain.setValueAtTime(0.2, now); riseGain.gain.linearRampToValueAtTime(0.35, now + 1); riseGain.gain.linearRampToValueAtTime(0, now + 2); rise.start(now); rise.stop(now + 2); const finalHit = audioCtx.createOscillator(); const finalGain = audioCtx.createGain(); finalHit.connect(finalGain); finalGain.connect(audioCtx.destination); finalHit.type = 'square'; finalHit.frequency.setValueAtTime(120, now + 1.6); finalHit.frequency.exponentialRampToValueAtTime(50, now + 2); finalGain.gain.setValueAtTime(0.7, now + 1.6); finalGain.gain.exponentialRampToValueAtTime(0.01, now + 2.2); finalHit.start(now + 1.6); finalHit.stop(now + 2.2); break; } case 'click': { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.setValueAtTime(1500, now); o.frequency.exponentialRampToValueAtTime(300, now + 0.1); g.gain.setValueAtTime(1.0, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.12); o.start(now); o.stop(now + 0.12); break; } case 'flip': { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'triangle'; o.frequency.setValueAtTime(200, now); o.frequency.exponentialRampToValueAtTime(2500, now + 0.5); g.gain.setValueAtTime(1.0, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.5); o.start(now); o.stop(now + 0.5); break; } case 'coinLand': { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'square'; o.frequency.setValueAtTime(1600, now); o.frequency.exponentialRampToValueAtTime(60, now + 0.3); g.gain.setValueAtTime(0.9, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3); o.start(now); o.stop(now + 0.3); break; } case 'roll': { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'sawtooth'; o.frequency.setValueAtTime(400 + Math.random() * 600, now); g.gain.setValueAtTime(0.6, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.06); o.start(now); o.stop(now + 0.06); break; } case 'result': { const o1 = audioCtx.createOscillator(); const o2 = audioCtx.createOscillator(); const g1 = audioCtx.createGain(); const g2 = audioCtx.createGain(); o1.connect(g1); o2.connect(g2); g1.connect(audioCtx.destination); g2.connect(audioCtx.destination); o1.type = 'sine'; o2.type = 'triangle'; o1.frequency.setValueAtTime(700, now); o1.frequency.setValueAtTime(900, now + 0.1); o1.frequency.setValueAtTime(1100, now + 0.2); o1.frequency.setValueAtTime(1300, now + 0.3); o2.frequency.setValueAtTime(350, now); o2.frequency.setValueAtTime(450, now + 0.1); o2.frequency.setValueAtTime(550, now + 0.2); g1.gain.setValueAtTime(1.0, now); g1.gain.linearRampToValueAtTime(0.8, now + 0.3); g1.gain.exponentialRampToValueAtTime(0.01, now + 0.5); g2.gain.setValueAtTime(0.6, now); g2.gain.exponentialRampToValueAtTime(0.01, now + 0.5); o1.start(now); o2.start(now); o1.stop(now + 0.5); o2.stop(now + 0.5); break; } case 'spin': { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'sawtooth'; o.frequency.setValueAtTime(100, now); o.frequency.linearRampToValueAtTime(1400, now + 0.4); g.gain.setValueAtTime(0.7, now); g.gain.linearRampToValueAtTime(1.0, now + 0.3); g.gain.exponentialRampToValueAtTime(0.01, now + 0.5); o.start(now); o.stop(now + 0.5); break; } case 'tick': { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'square'; o.frequency.setValueAtTime(3200, now); g.gain.setValueAtTime(0.4, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.025); o.start(now); o.stop(now + 0.025); break; } } } catch (e) {} }
+
+        // ============ LOGO LOADER (FIXED URL) ============
+        function loadCrowImage() {
+            // Direct link from PurePNG ID 3711
+            const imgSrc = 'https://purepng.com/public/uploads/large/purepng.com-crow-1415286068484hpmkn.png';
+            // Fallback jika gambar utama error
+            const fallback = 'https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?auto=format&fit=crop&w=600&q=80';
+            
+            crowImg.onload = function() { crowImg.classList.add('loaded'); crowImg.style.display = 'block'; };
+            crowImg.onerror = function() { console.warn("Direct PurePNG link failed, using fallback."); crowImg.src = fallback; };
+            crowImg.src = imgSrc;
+        }
+
+        // ============ INTRO TRIGGER ============
+        function startIntroSequence() { initAudio(); unlockAudio(); startOverlay.classList.add('hide'); loadCrowImage(); logoFrame.classList.add('animate'); playSound('intro'); setTimeout(() => { introTitle.classList.add('animate'); }, 1800); setTimeout(() => { introSubtitle.classList.add('animate'); }, 2500); setTimeout(() => { introLine.classList.add('animate'); }, 2800); setTimeout(() => { intro.classList.add('hidden'); mainContent.classList.add('visible'); triggerReveal(); }, 4500); }
+        startBtn.addEventListener('click', startIntroSequence);
+        startBtn.addEventListener('touchend', (e) => { e.preventDefault(); startIntroSequence(); });
+        document.querySelectorAll('.action-btn, .feature-card, .back-btn, .add-btn, .remove-btn').forEach(el => { el.addEventListener('click', (e) => { const ripple = document.createElement('div'); ripple.className = 'click-ripple'; ripple.style.left = e.clientX + 'px'; ripple.style.top = e.clientY + 'px'; document.body.appendChild(ripple); setTimeout(() => ripple.remove(), 500); }); });
+        function triggerReveal() { document.querySelectorAll('.reveal-item').forEach((item, i) => { setTimeout(() => { item.classList.add('visible'); }, i * 110); }); }
+        function resetToolState() { stopAllSounds(); if (coin) { coin.classList.remove('flipping'); coin.style.transform = ''; } if (flipBtn) flipBtn.disabled = false; if (generateBtn) generateBtn.disabled = false; if (spinBtn) spinBtn.disabled = false; if (numberDisplay) numberDisplay.classList.remove('rolling'); if (winnerDisplay) winnerDisplay.classList.remove('show'); isAnimating = false; }
+        featureCards.forEach(card => { card.addEventListener('click', () => { unlockAudio(); playSound('click'); showTool(card.dataset.tool); }); });
+        function showTool(tool) { heroSection.style.display = 'none'; mainFooter.style.display = 'none'; backBtn.style.display = 'flex'; document.querySelectorAll('.tool-section').forEach(s => s.classList.remove('active')); document.getElementById(tool + 'Tool').classList.add('active'); currentTool = tool; if (tool === 'spin') { wheelAngle = 0; initWheel(); } }
+        backBtn.addEventListener('click', () => { resetToolState(); unlockAudio(); playSound('click'); heroSection.style.display = 'flex'; mainFooter.style.display = 'block'; backBtn.style.display = 'none'; document.querySelectorAll('.tool-section').forEach(s => s.classList.remove('active')); currentTool = null; });
+
+        // ============ COIN FLIP ============
+        flipBtn.addEventListener('click', () => { if (isAnimating) return; isAnimating = true; flipBtn.disabled = true; coinResult.textContent = ''; unlockAudio(); const result = Math.random() < 0.5 ? 'HEADS' : 'TAILS'; const fullRotations = (5 + Math.floor(Math.random() * 6)) * 360; const finalAngle = fullRotations + (result === 'HEADS' ? 0 : 180); coin.style.transition = 'none'; coin.style.transform = 'rotateY(0deg)'; void coin.offsetWidth; playSound('flip'); currentTimeouts.push(setTimeout(() => playSound('flip'), 600)); currentTimeouts.push(setTimeout(() => playSound('flip'), 1200)); currentTimeouts.push(setTimeout(() => playSound('flip'), 1800)); coin.style.transition = 'transform 3s cubic-bezier(0.23, 1, 0.32, 1)'; coin.style.transform = `rotateY(${finalAngle}deg)`; currentTimeouts.push(setTimeout(() => { coinResult.textContent = result; coinResult.style.color = result === 'HEADS' ? 'var(--accent)' : 'var(--accent-secondary)'; if (result === 'HEADS') { headsTotal++; headsCount.textContent = headsTotal; } else { tailsTotal++; tailsCount.textContent = tailsTotal; } playSound('coinLand'); currentTimeouts.push(setTimeout(() => playSound('result'), 150)); isAnimating = false; flipBtn.disabled = false; }, 3000)); });
+
+        // ============ NUMBER GENERATOR ============
+        generateBtn.addEventListener('click', () => { if (isAnimating) return; isAnimating = true; generateBtn.disabled = true; unlockAudio(); const min = parseInt(minRange.value) || 0; const max = parseInt(maxRange.value) || 1000; const clampedMin = Math.max(0, Math.min(min, 999)); const clampedMax = Math.max(clampedMin + 1, Math.min(max, 1000)); let count = 0; const maxCount = 35; numberDisplay.classList.add('rolling'); currentInterval = setInterval(() => { const randNum = Math.floor(Math.random() * (clampedMax - clampedMin + 1)) + clampedMin; numberDisplay.textContent = randNum.toString(); playSound('roll'); count++; if (count >= maxCount) { clearInterval(currentInterval); currentInterval = null; numberDisplay.classList.remove('rolling'); const finalNum = Math.floor(Math.random() * (clampedMax - clampedMin + 1)) + clampedMin; numberDisplay.textContent = finalNum.toString(); playSound('result'); isAnimating = false; generateBtn.disabled = false; } }, 70); });
+
+        // ============ SPIN WHEEL ============
+        function initWheel() { updateWheelSegments(); }
+        function drawWheel(rotation) { const canvas = wheelCanvas; const ctx = canvas.getContext('2d'); const rect = canvas.parentElement.getBoundingClientRect(); canvas.width = rect.width * 2; canvas.height = rect.height * 2; ctx.scale(2, 2); const w = rect.width; const h = rect.height; const cx = w / 2; const cy = h / 2; const radius = Math.min(cx, cy) - 2; ctx.clearRect(0, 0, w, h); ctx.save(); ctx.translate(cx, cy); ctx.rotate(rotation * Math.PI / 180); ctx.translate(-cx, -cy); const numSegments = wheelSegments.length; const arc = (2 * Math.PI) / numSegments; const shift = arc / 2; for (let i = 0; i < numSegments; i++) { const startAngle = (i * arc) - Math.PI / 2 - shift; const endAngle = startAngle + arc; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, radius, startAngle, endAngle); ctx.closePath(); ctx.fillStyle = wheelColors[i % wheelColors.length]; ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1; ctx.stroke(); ctx.save(); const textAngle = startAngle + arc / 2; const textRadius = radius * 0.65; const textX = cx + Math.cos(textAngle) * textRadius; const textY = cy + Math.sin(textAngle) * textRadius; ctx.translate(textX, textY); ctx.rotate(-rotation * Math.PI / 180); ctx.fillStyle = '#0a0a0a'; ctx.font = 'bold 11px Oswald, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; const displayText = wheelSegments[i].length > 10 ? wheelSegments[i].substring(0, 10) + '...' : wheelSegments[i]; ctx.fillText(displayText.toUpperCase(), 0, 0); ctx.restore(); } ctx.restore(); }
+        function updateWheelSegments() { wheelSegments = Array.from(wheelInputs.querySelectorAll('input')).map(input => input.value.trim() || 'Empty').slice(0, 30); drawWheel(wheelAngle); }
+        function addWheelInput(value = '') { const num = wheelInputs.children.length + 1; const row = document.createElement('div'); row.className = 'spin-input-row'; row.innerHTML = `<input type="text" placeholder="Option ${num}" value="${value}"><button type="button" class="remove-btn" aria-label="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`; wheelInputs.appendChild(row); row.querySelector('.remove-btn').addEventListener('click', (e) => { if (wheelInputs.children.length > 2) { row.remove(); updateWheelSegments(); } }); row.querySelector('input').addEventListener('input', updateWheelSegments); row.querySelector('.remove-btn').addEventListener('click', (e) => { const ripple = document.createElement('div'); ripple.className = 'click-ripple'; ripple.style.left = e.clientX + 'px'; ripple.style.top = e.clientY + 'px'; document.body.appendChild(ripple); setTimeout(() => ripple.remove(), 500); }); }
+        addSegmentBtn.addEventListener('click', () => { unlockAudio(); playSound('click'); if (wheelInputs.children.length < 30) addWheelInput(); });
+        wheelInputs.querySelectorAll('.remove-btn').forEach(btn => { btn.addEventListener('click', (e) => { if (wheelInputs.children.length > 2) { e.target.closest('.spin-input-row').remove(); updateWheelSegments(); } }); });
+        wheelInputs.querySelectorAll('input').forEach(input => { input.addEventListener('input', updateWheelSegments); });
+        spinBtn.addEventListener('click', () => { if (isAnimating) return; isAnimating = true; spinBtn.disabled = true; winnerDisplay.classList.remove('show'); unlockAudio(); updateWheelSegments(); const currentAngle = wheelAngle; const spins = 5 + Math.random() * 5; const extraDeg = Math.random() * 360; const targetAngle = currentAngle + (spins * 360) + extraDeg; const duration = 5000; const startTime = performance.now(); playSound('spin'); function animate(time) { const elapsed = time - startTime; const progress = Math.min(elapsed / duration, 1); const eased = 1 - Math.pow(1 - progress, 4); wheelAngle = currentAngle + (targetAngle - currentAngle) * eased; drawWheel(wheelAngle); if (progress < 1) { wheelAnimationId = requestAnimationFrame(animate); } else { const normalizedAngle = ((wheelAngle % 360) + 360) % 360; const winningDeg = (360 - normalizedAngle + 360) % 360; const segAngle = 360 / wheelSegments.length; const finalWinningDeg = winningDeg + segAngle / 2; let winIdx = Math.floor((finalWinningDeg % 360) / segAngle); if (winIdx >= wheelSegments.length) winIdx = 0; winnerText.textContent = wheelSegments[winIdx]; winnerDisplay.classList.add('show'); playSound('result'); isAnimating = false; spinBtn.disabled = false; } } wheelAnimationId = requestAnimationFrame(animate); });
+
+        // ============ KEYBOARD ============
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && currentTool) backBtn.click(); });
+        document.querySelectorAll('button, input, .feature-card').forEach(el => { el.setAttribute('tabindex', '0'); });
+        featureCards.forEach(card => { card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); } }); });
+    </script>
+</body>
+</html>
